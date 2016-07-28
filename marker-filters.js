@@ -17,7 +17,13 @@ const hideClinic = (markers, c) => hideMarker(markers[c['S/N'] - 1])
 const isOpenOnSaturdays = c => !c.SAT.includes('Closed')
 const isOpenOnSundays = c => !c.SUN.includes('Closed')
 const isOpenOnPublicHolidays = c => !c['PUBLIC HOLIDAYS'].includes('Closed')
-const isOpen24Hours = c => [c['MON - FRI'], c.SAT, c.SUN, c['PUBLIC HOLIDAYS'], c['CLINIC REMARKS']].find(v => v.includes('24 Hour') || v.includes('24 Hr'))
+const isOpen24Hours = c => ([
+	c['MON - FRI'],
+	c.SAT,
+	c.SUN,
+	c['PUBLIC HOLIDAYS'],
+	c['CLINIC REMARKS']
+].find(v => v.includes('24 Hour') || v.includes('24 Hr')))
 
 const showFilteredClinics = function (filterFn) {
 	let filteredClinics
