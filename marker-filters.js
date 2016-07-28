@@ -1,15 +1,19 @@
+// Global variable binders
 const withMarkers = f => f.bind(this, window.markers)
 const withClinics = f => f.bind(this, window.clinics)
 
+// Google Maps marker functions
 const showMarker = m => m.setVisible(true)
 const hideMarker = m => m.setVisible(false)
 
 const showAll = markers => markers.forEach(showMarker)
 const hideAll = markers => markers.forEach(hideMarker)
 
+// Lookup Google Maps marker corresponding to a clinic
 const showClinic = (markers, c) => showMarker(markers[c['S/N'] - 1])
 const hideClinic = (markers, c) => hideMarker(markers[c['S/N'] - 1])
 
+// Filter functions
 const isOpenOnSaturdays = c => !c.SAT.includes('Closed')
 const isOpenOnSundays = c => !c.SUN.includes('Closed')
 const isOpenOnPublicHolidays = c => !c['PUBLIC HOLIDAYS'].includes('Closed')
@@ -24,6 +28,7 @@ const showFilteredClinics = function (filterFn) {
 	}
 }
 
+// Public functions for binding to event listeners
 const showClinicsOpenOnSaturdays = withClinics(showFilteredClinics(isOpenOnSaturdays))
 const showClinicsOpenOnSundays = withClinics(showFilteredClinics(isOpenOnSundays))
 const showClinicsOpenOnPublicHolidays = withClinics(showFilteredClinics(isOpenOnPublicHolidays))
