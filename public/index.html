@@ -12,7 +12,7 @@
 
 		#map {
 			width: 100vw;
-			height: calc(100vh - 2rem);
+			height: calc(100vh - 2.5rem);
 			background-color: grey;
 		}
 
@@ -20,17 +20,21 @@
 			padding: 0.5rem;
 			background: #4177b9;
 			color: white;
-			height: 2rem;
+			height: 2.5rem;
+			box-sizing: border-box;
+			text-align: center;
 		}
 		</style>
 </head>
 <body>
 	<div id="control-panel">
-		<button onclick="filterAndShow(Boolean, window.markers)">All</button>
-		<button onclick="filterAndShow(isOpenOnSaturdays, window.markers)">Open on Saturdays</button>
-		<button onclick="filterAndShow(isOpenOnSundays, window.markers)">Open on Sundays</button>
-		<button onclick="filterAndShow(isOpenOnPublicHolidays, window.markers)">Open on Public Holidays</button>
-		<button onclick="filterAndShow(isOpen24Hours, window.markers)">Open 24 Hours</button>
+		<select onchange="filterAndShow(event.target.value, window.markers)">
+			<option value="Boolean">All</option>
+			<option value="isOpenOnSaturdays">Open on Saturdays</option>
+			<option value="isOpenOnSundays">Open on Sundays</option>
+			<option value="isOpenOnPublicHolidays">Open on Public Holidays</option>
+			<option value="isOpen24Hours">Open 24 Hours</option>
+		</select>
 	</div>
 	<div id="map"></div>
 			<script>
@@ -82,16 +86,18 @@ Remarks: ${clinicRemarks}`
 		})
       }
 
-const isOpenOnSaturdays = clinic => !clinic.sat.includes('Closed')
-const isOpenOnSundays = clinic => !clinic.sun.includes('Closed')
-const isOpenOnPublicHolidays = clinic => !clinic.publicHolidays.includes('Closed')
-const isOpen24Hours = clinic => ([
-	clinic.monFri,
-	clinic.sat,
-	clinic.sun,
-	clinic.publicHolidays,
-	clinic.clinicRemarks
-].find(v => v && (v.includes('24 Hour') || v.includes('24 Hr'))))
+const filterFns = {
+	isOpenOnSaturdays: clinic => !clinic.sat.includes('Closed'),
+	isOpenOnSundays: clinic => !clinic.sun.includes('Closed'),
+	isOpenOnPublicHolidays: clinic => !clinic.publicHolidays.includes('Closed'),
+	isOpen24Hours: clinic => ([
+		clinic.monFri,
+		clinic.sat,
+		clinic.sun,
+		clinic.publicHolidays,
+		clinic.clinicRemarks
+	].find(v => v && (v.includes('24 Hour') || v.includes('24 Hr')))),
+}
 
 // function hideMarkers(markers) {
 // 	markers.forEach(marker => marker.setVisible(false))
@@ -103,7 +109,7 @@ function showMarkers(markers) {
 
 function filterAndShow(filterFn, markers) {
 	markers.forEach(marker => marker.setVisible(false))
-	showMarkers(markers.filter(marker => filterFn(marker.clinic)))
+	showMarkers(markers.filter(marker => filterFns[filterFn](marker.clinic)))
 }
 
 	  </script>
