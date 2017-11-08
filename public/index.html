@@ -90,7 +90,7 @@ const isOpen24Hours = clinic => ([
 	clinic.sun,
 	clinic.publicHolidays,
 	clinic.clinicRemarks
-].find(v => v.includes('24 Hour') || v.includes('24 Hr')))
+].find(v => v && (v.includes('24 Hour') || v.includes('24 Hr'))))
 
 // function hideMarkers(markers) {
 // 	markers.forEach(marker => marker.setVisible(false))
