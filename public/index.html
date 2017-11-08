@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+	<style>
+		body {
+			margin: 0;
+			font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+		}
+
+		#map {
+			width: 100vw;
+			height: calc(100vh - 2rem);
+			background-color: grey;
+		}
+
+		#control-panel {
+			padding: 0.5rem;
+			background: #4177b9;
+			color: white;
+			height: 2rem;
+		}
+		</style>
+</head>
+<body>
+	<div id="control-panel">
+		<button onclick="filterAndShow(Boolean, window.markers)">All</button>
+		<button onclick="filterAndShow(isOpenOnSaturdays, window.markers)">Open on Saturdays</button>
+		<button onclick="filterAndShow(isOpenOnSundays, window.markers)">Open on Sundays</button>
+		<button onclick="filterAndShow(isOpenOnPublicHolidays, window.markers)">Open on Public Holidays</button>
+		<button onclick="filterAndShow(isOpen24Hours, window.markers)">Open 24 Hours</button>
+	</div>
+	<div id="map"></div>
+			<script>
+function initMap() {
+        const singapore = {lat: 1.3554, lng: 103.8677};
+        const map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 11,
+          center: singapore
+        });
+	window.map = map
+        var infoWindow = new google.maps.InfoWindow();
+
+	fetch('/clean-data-with-positions.json')
+		.then(response => response.json())
+		.then(clinics => clinics.map(clinic => new google.maps.Marker({
+			clinic,
+			position: clinic.position,
+			map: map
+		}))).then(markers => {
+			window.markers = markers
+			markers.forEach(marker => {
+				google.maps.event.addListener(marker, 'click', function() {
+					infoWindow.close();
+					infoWindow = new google.maps.InfoWindow();
+					const { clinicName, monFri, sat, sun, publicHolidays, clinicRemarks, blk, roadName,
+						unitNo,
+						buildingName,
+						postalCode,
+						phone,
+					} = marker.clinic
+const infoContent = `${clinicName}
+
+${blk} ${roadName}
+${unitNo} ${buildingName}
+Singapore ${postalCode}
+
+Phone: ${phone}
+
+Mon-Fri: ${monFri}
+Sat: ${sat}
+Sun: ${sun}
+Public Holidays: ${publicHolidays}
+
+Remarks: ${clinicRemarks}`
+					infoWindow.setContent(infoContent.replace(/\n/g, '<br>'));
+					infoWindow.open(map, marker);
+				});
+			})
+		})
+      }
+
+const isOpenOnSaturdays = clinic => !clinic.sat.includes('Closed')
+const isOpenOnSundays = clinic => !clinic.sun.includes('Closed')
+const isOpenOnPublicHolidays = clinic => !clinic.publicHolidays.includes('Closed')
+const isOpen24Hours = clinic => ([
+	clinic.monFri,
+	clinic.sat,
+	clinic.sun,
+	clinic.publicHolidays,
+	clinic.clinicRemarks
+].find(v => v.includes('24 Hour') || v.includes('24 Hr')))
+
+// function hideMarkers(markers) {
+// 	markers.forEach(marker => marker.setVisible(false))
+// }
+//
+function showMarkers(markers) {
+	markers.forEach(marker => marker.setVisible(true))
+}
+
+function filterAndShow(filterFn, markers) {
+	markers.forEach(marker => marker.setVisible(false))
+	showMarkers(markers.filter(marker => filterFn(marker.clinic)))
+}
+
+	  </script>
+<script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAn5Nt8e_rYahYmraxZSc5quaS0h4RfNwI&callback=initMap">
+    </script>
+</body>
+</html>
