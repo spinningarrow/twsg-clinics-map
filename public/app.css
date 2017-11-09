@@ -1,0 +1,19 @@
+body {
+	margin: 0;
+	font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+}
+
+#map {
+	width: 100vw;
+	height: calc(100vh - 2.5rem);
+	background-color: grey;
+}
+
+#control-panel {
+	padding: 0.5rem;
+	background: #4177b9;
+	color: white;
+	height: 2.5rem;
+	box-sizing: border-box;
+	text-align: center;
+}
