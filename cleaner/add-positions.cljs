@@ -1,6 +1,18 @@
 #!/usr/bin/env planck
 
-(require '[planck.core :refer [slurp]])
+(require '[planck.core :refer [slurp *in*]])
+
+(defn json->clj
+  [json]
+  (-> json
+      JSON.parse
+      (js->clj :keywordize-keys true)))
+
+(defn clj->json
+  [clj]
+  (-> clj
+      clj->js
+      JSON.stringify))
 
 (def api-endpoint (str "https://maps.googleapis.com/maps/api/geocode/json"
                        "?key=AIzaSyAn5Nt8e_rYahYmraxZSc5quaS0h4RfNwI"))
@@ -15,8 +27,7 @@
   (-> address
       api-endpoint-with-address
       slurp
-      JSON.parse
-      (js->clj :keywordize-keys true)
+      json->clj
       :results
       first
       :geometry
@@ -26,15 +37,9 @@
   [{roadName :roadName block :blk postalCode :postalCode}]
   (str block " " roadName ", Singapore " postalCode))
 
-(def data (-> "clean-data.json"
-              slurp
-              JSON.parse
-              (js->clj :keywordize-keys true)))
+(def in (-> *in*
+            slurp
+            json->clj))
 
-(defn main
-  []
-  (-> (map #(update %1 :position (fn [] (position (address %1)))) data)
-      clj->js
-      JSON.stringify))
-
-(print (main))
+(print (-> (map #(update %1 :position (fn [] (position (address %1)))) in)
+           clj->json))

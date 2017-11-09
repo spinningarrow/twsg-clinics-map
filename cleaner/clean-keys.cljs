@@ -1,8 +1,20 @@
 #!/usr/bin/env planck
 
-(require '[planck.core :refer [slurp]])
+(require '[planck.core :refer [slurp *in*]])
 (require '[clojure.string :refer [split replace]])
 (require '[clojure.set :refer [rename-keys]])
+
+(defn json->clj
+  [json]
+  (-> json
+      JSON.parse
+      (js->clj :keywordize-keys true)))
+
+(defn clj->json
+  [clj]
+  (-> clj
+      clj->js
+      JSON.stringify))
 
 (defn capitalise
   [word]
@@ -34,11 +46,9 @@
   (let [keymap (normalised-keys-map (keys m))]
     (rename-keys m keymap)))
 
-(def data (-> "data.json"
-              slurp
-              JSON.parse
-              js->clj))
+(def in (-> *in*
+            slurp
+            json->clj))
 
-(print (-> (map normalised-keys data)
-           clj->js
-           JSON.stringify))
+(print (-> (map normalised-keys in)
+           clj->json))
