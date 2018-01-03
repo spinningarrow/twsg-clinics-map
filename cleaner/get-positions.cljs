@@ -24,6 +24,7 @@
 
 (defn position
   [address]
+  (.error js/console "INFO: Getting position for" address)
   (-> address
       api-endpoint-with-address
       slurp
@@ -41,5 +42,7 @@
             slurp
             json->clj))
 
-(print (-> (map #(update %1 :position (fn [] (position (address %1)))) in)
-           clj->json))
+(print (->> in
+            (map (fn [clinic] {:id (clinic :id)
+                               :position (position (address clinic))}))
+            clj->json))

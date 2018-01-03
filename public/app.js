@@ -19,13 +19,22 @@ function initMap() {
 				google.maps.event.addListener(marker, 'click', function() {
 					infoWindow.close();
 					infoWindow = new google.maps.InfoWindow();
-					const { clinicName, monFri, sat, sun, publicHolidays, clinicRemarks, blk, roadName,
+					const {
+						clinicName,
+						monFri,
+						sat,
+						sun,
+						publicHolidays,
+						clinicRemarks,
+						blk,
+						roadName,
 						unitNo,
 						buildingName,
 						postalCode,
 						phone,
 					} = marker.clinic
-					const infoContent = `${clinicName}
+					const infoContent = `
+${clinicName}
 ${blk} ${roadName}
 ${unitNo} ${buildingName}
 Singapore ${postalCode}
@@ -37,8 +46,8 @@ Sat: ${sat}
 Sun: ${sun}
 Public Holidays: ${publicHolidays}
 
-Remarks: ${clinicRemarks}`
-					infoWindow.setContent(infoContent.replace(/\n/g, '<br>'));
+${clinicRemarks ? 'Remarks: ' + clinicRemarks : ''}`
+					infoWindow.setContent(infoContent.trim().replace(/\n/g, '<br>'));
 					infoWindow.open(map, marker);
 				});
 			})
