@@ -55,9 +55,9 @@ ${clinicRemarks ? 'Remarks: ' + clinicRemarks : ''}`
 }
 
 const filterFns = {
-	isOpenOnSaturdays: clinic => !clinic.sat.includes('Closed'),
-	isOpenOnSundays: clinic => !clinic.sun.includes('Closed'),
-	isOpenOnPublicHolidays: clinic => !clinic.publicHolidays.includes('Closed'),
+	isOpenOnSaturdays: clinic => clinic.sat && !clinic.sat.includes('Closed'),
+	isOpenOnSundays: clinic => clinic.sun && !clinic.sun.includes('Closed'),
+	isOpenOnPublicHolidays: clinic => clinic.publicHolidays && !clinic.publicHolidays.includes('Closed'),
 	isOpen24Hours: clinic => ([
 		clinic.monFri,
 		clinic.sat,
