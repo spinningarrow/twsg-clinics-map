@@ -7,7 +7,7 @@ function initMap() {
 	window.map = map
 	var infoWindow = new google.maps.InfoWindow();
 
-	fetch('https://s3-ap-southeast-1.amazonaws.com/clinic-mapper/axa-14-july-2017-with-positions.json.gz')
+	fetch('https://s3-ap-southeast-1.amazonaws.com/clinic-mapper/clinics.json.gz')
 		.then(response => response.json())
 		.then(clinics => clinics.map(clinic => new google.maps.Marker({
 			clinic,
