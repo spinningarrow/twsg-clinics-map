@@ -65,6 +65,7 @@ const filterFns = {
 		clinic.publicHolidays,
 		clinic.clinicRemarks
 	].find(v => v && (v.includes('24 Hour') || v.includes('24 Hr')))),
+	all: Boolean,
 }
 
 function showMarkers(markers) {
