@@ -5,7 +5,7 @@ function initMap() {
 		center: singapore
 	});
 	window.map = map
-	var infoWindow = new google.maps.InfoWindow();
+	let infoWindow = new google.maps.InfoWindow();
 
 	fetch('https://s3-ap-southeast-1.amazonaws.com/clinic-mapper/clinics.json.gz')
 		.then(response => response.json())
@@ -35,9 +35,7 @@ function initMap() {
 					} = marker.clinic
 					const infoContent = `
 ${clinicName}
-${blk} ${roadName}
-${unitNo} ${buildingName}
-Singapore ${postalCode}
+${address(marker.clinic).join('\n')}
 
 Phone: ${phone}
 
@@ -53,6 +51,12 @@ ${clinicRemarks ? 'Remarks: ' + clinicRemarks : ''}`
 			})
 		})
 }
+
+const address = ({ blk, roadName, unitNo, buildingName, zone, postalCode }) => [
+	`${blk} ${roadName}`.trim(),
+	`${unitNo} ${buildingName}`.trim(),
+	`${zone.match(/malaysia/i) ? 'Malaysia' : 'Singapore'} ${postalCode}`.trim(),
+]
 
 const filterFns = {
 	isOpenOnSaturdays: clinic => clinic.sat && !clinic.sat.includes('Closed'),
