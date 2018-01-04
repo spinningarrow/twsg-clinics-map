@@ -35,8 +35,9 @@
       :location))
 
 (defn address
-  [{roadName :roadName block :blk postalCode :postalCode}]
-  (str block " " roadName ", Singapore " postalCode))
+  [{roadName :roadName block :blk postalCode :postalCode zone :zone}]
+  (let [country (if (re-find #"(?i)malaysia" zone) "Malaysia" "Singapore")]
+    (str block " " roadName ", " country " " postalCode)))
 
 (def in (-> *in*
             slurp
