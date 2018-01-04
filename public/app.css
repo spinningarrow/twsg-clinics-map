@@ -10,16 +10,83 @@ body {
 }
 
 #control-panel {
-	padding: 0.5rem;
 	background: #4177b9;
+	bottom: 0;
+	box-sizing: border-box;
 	color: #ddd;
 	height: 4rem;
-	box-sizing: border-box;
-	text-align: center;
+	left: 0;
+	padding-top: 0.5rem;
+	position: fixed;
+	right: 0;
+	transition: height 0.2s;
 }
 
 #control-panel select {
 	border: 1px solid;
+	font-size: 1.5rem;
+	max-width: 80%;
+}
+
+.control-panel-actions {
+	align-items: center;
+	display: flex;
+	flex-wrap: nowrap;
 	font-size: 2rem;
-	max-width: 100%;
+	justify-content: space-between;
+	padding: 0 0.25rem;
+}
+
+.control-panel-actions .action {
+	color: white;
+	padding: 0 0.5rem;
+	text-decoration: none;
+}
+
+
+.control-panel-actions .action-close {
+	display: none;
+}
+
+#control-panel:target {
+	height: 40vh;
+}
+
+#control-panel:target .action-open {
+	display: none;
+}
+
+#control-panel:target .action-close {
+	display: initial;
+}
+
+.clinics-list {
+	height: calc(40vh - 4rem);
+	list-style: none;
+	margin-top: 0.5rem;
+	margin: 0;
+	overflow: auto;
+	padding: 0;
+	text-align: initial;
+	-webkit-overflow-scrolling: touch;
+}
+
+.clinics-list .clinic-name {
+    font-size: 1rem;
+    margin: 0;
+    font-weight: normal;
+}
+
+.clinics-list .clinic-address {
+    margin: 0;
+    font-size: small;
+    color: #a2b6d0;
+}
+
+.clinics-list li {
+    padding: 0.5rem 0.25rem;
+}
+
+.clinics-list li:nth-child(odd) {
+    background: #38649c;
 }

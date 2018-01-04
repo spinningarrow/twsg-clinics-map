@@ -9,16 +9,24 @@
 		<link rel="stylesheet" href="/app.css">
 	</head>
 	<body>
-		<div id="control-panel">
-			<select autocomplete="off" onchange="filterAndShow(event.target.value, window.markers)">
-				<option value="all">All</option>
-				<option value="isOpenOnSaturdays">Open on Saturdays</option>
-				<option value="isOpenOnSundays">Open on Sundays</option>
-				<option value="isOpenOnPublicHolidays">Open on Public Holidays</option>
-				<option value="isOpen24Hours">Open 24 Hours</option>
-			</select>
-		</div>
 		<div id="map"></div>
+
+		<div id="control-panel">
+			<div class="control-panel-actions">
+				<select autocomplete="off" onchange="filterAndShow(event.target.value, window.markers)">
+					<option value="all">All</option>
+					<option value="isOpenOnSaturdays">Open on Saturdays</option>
+					<option value="isOpenOnSundays">Open on Sundays</option>
+					<option value="isOpenOnPublicHolidays">Open on Public Holidays</option>
+					<option value="isOpen24Hours">Open 24 Hours</option>
+				</select>
+
+				<a href="#control-panel" class="action action-open">⬆</a>
+				<a href="#" class="action action-close">⬇</a>
+			</div>
+
+			<ul id="clinics" class="clinics-list"></ul>
+		</div>
 
 		<script src="/app.js"></script>
 		<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAn5Nt8e_rYahYmraxZSc5quaS0h4RfNwI&callback=initMap"></script>

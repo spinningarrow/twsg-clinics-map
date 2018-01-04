@@ -49,6 +49,8 @@ ${clinicRemarks ? 'Remarks: ' + clinicRemarks : ''}`
 					infoWindow.open(map, marker);
 				});
 			})
+
+			showMarkers(window.markers)
 		})
 }
 
@@ -74,9 +76,25 @@ const filterFns = {
 
 function showMarkers(markers) {
 	markers.forEach(marker => marker.setVisible(true))
+	updateVisibleClinics(markers)
 }
 
 function filterAndShow(filterFn, markers) {
 	markers.forEach(marker => marker.setVisible(false))
 	showMarkers(markers.filter(marker => filterFns[filterFn](marker.clinic)))
+}
+
+const ClinicItem = clinic => `
+	<li>
+		<p class="clinic-name">${clinic.clinicName}</p>
+		<p class="clinic-address">${address(clinic).join(', ')}</p>
+	</li>
+`
+
+function updateVisibleClinics(markers) {
+	const visibleClinics = markers
+		.filter(marker => marker.getVisible())
+		.map(marker => marker.clinic)
+
+	document.querySelector('#clinics').innerHTML = visibleClinics.map(ClinicItem).join('')
 }
