@@ -1,44 +1,42 @@
-const IS_TEST_ENV = location.href.indexOf('env=test') !== -1
+window.clinicsMap = (() => {
+	const IS_TEST_ENV = location.href.indexOf('env=test') !== -1
+	const CLINICS_DATA_URI = 'https://s3-ap-southeast-1.amazonaws.com/clinic-mapper/clinics.json.gz'
+	const SINGAPORE_POSITION = { lat: 1.3554, lng: 103.8677 }
 
-function initMap() {
-	const singapore = {lat: 1.3554, lng: 103.8677};
-	const map = new google.maps.Map(document.getElementById('map'), {
-		zoom: 11,
-		center: singapore
-	});
-	window.map = map
-	let infoWindow = new google.maps.InfoWindow();
+	let mapInfoWindow = null
+	let resolveMapInitialised
+	let resolveMarkers
 
-	fetch('https://s3-ap-southeast-1.amazonaws.com/clinic-mapper/clinics.json.gz')
-		.then(response => response.json())
-		.then(clinics => clinics.map(clinic => new google.maps.Marker({
-			clinic,
-			position: clinic.position,
-			map: map,
-			optimized: !IS_TEST_ENV,
-		}))).then(markers => {
-			window.markers = markers
-			markers.forEach(marker => {
-				google.maps.event.addListener(marker, 'click', function() {
-					infoWindow.close();
-					infoWindow = new google.maps.InfoWindow();
-					const {
-						clinicName,
-						monFri,
-						sat,
-						sun,
-						publicHolidays,
-						clinicRemarks,
-						blk,
-						roadName,
-						unitNo,
-						buildingName,
-						postalCode,
-						phone,
-					} = marker.clinic
-					const infoContent = `
+	const googleMapsInitialised = new Promise(resolve =>
+		resolveMapInitialised = resolve)
+	const mapMarkers = new Promise(resolve => resolveMarkers = resolve)
+
+	// Helpers
+	const address = ({ blk, roadName, unitNo, buildingName, zone, postalCode }) => [
+		`${blk} ${roadName}`.trim(),
+		`${unitNo} ${buildingName}`.trim(),
+		`${zone.match(/malaysia/i) ? 'Malaysia' : 'Singapore'} ${postalCode}`.trim(),
+	]
+
+	const infoWindowContent = clinic => {
+		const {
+			clinicName,
+			monFri,
+			sat,
+			sun,
+			publicHolidays,
+			clinicRemarks,
+			blk,
+			roadName,
+			unitNo,
+			buildingName,
+			postalCode,
+			phone,
+		} = clinic
+
+		const content = `
 ${clinicName}
-${address(marker.clinic).join('\n')}
+${address(clinic).join('\n')}
 
 Phone: ${phone}
 
@@ -48,56 +46,97 @@ Sun: ${sun}
 Public Holidays: ${publicHolidays}
 
 ${clinicRemarks ? 'Remarks: ' + clinicRemarks : ''}`
-					infoWindow.setContent(infoContent.trim().replace(/\n/g, '<br>'));
-					infoWindow.open(map, marker);
-				});
-			})
 
-			showMarkers(window.markers)
+		return content.trim().replace(/\n/g, '<br>')
+	}
+
+	const filterFns = {
+		isOpenOnSaturdays: clinic => clinic.sat && !clinic.sat.includes('Closed'),
+		isOpenOnSundays: clinic => clinic.sun && !clinic.sun.includes('Closed'),
+		isOpenOnPublicHolidays: clinic => clinic.publicHolidays && !clinic.publicHolidays.includes('Closed'),
+		isOpen24Hours: clinic => ([
+			clinic.monFri,
+			clinic.sat,
+			clinic.sun,
+			clinic.publicHolidays,
+			clinic.clinicRemarks
+		].find(v => v && (v.includes('24 Hour') || v.includes('24 Hr')))),
+		all: Boolean,
+	}
+
+	// Map-related functions
+	const onMarkerClick = (clinicsMap, marker) => () => {
+		if (mapInfoWindow) mapInfoWindow.close()
+		else mapInfoWindow = new google.maps.InfoWindow()
+
+		mapInfoWindow.setContent(infoWindowContent(marker.clinic))
+		mapInfoWindow.open(clinicsMap, marker)
+	}
+
+	const addMarkers = clinicsMap => fetch(CLINICS_DATA_URI)
+		.then(response => response.json())
+		.then(clinics => clinics.map(clinic => new google.maps.Marker({
+			clinic,
+			position: clinic.position,
+			map: clinicsMap,
+			optimized: !IS_TEST_ENV,
+		}))).then(markers => {
+			resolveMarkers(markers)
+
+			markers.forEach(marker => google.maps.event.addListener(
+				marker,
+				'click',
+				onMarkerClick(clinicsMap, marker)
+			))
+
+			return markers
 		})
-}
 
-const address = ({ blk, roadName, unitNo, buildingName, zone, postalCode }) => [
-	`${blk} ${roadName}`.trim(),
-	`${unitNo} ${buildingName}`.trim(),
-	`${zone.match(/malaysia/i) ? 'Malaysia' : 'Singapore'} ${postalCode}`.trim(),
-]
+	const showMarkers = markers => {
+		markers.forEach(marker => marker.setVisible(true))
+		return markers
+	}
 
-const filterFns = {
-	isOpenOnSaturdays: clinic => clinic.sat && !clinic.sat.includes('Closed'),
-	isOpenOnSundays: clinic => clinic.sun && !clinic.sun.includes('Closed'),
-	isOpenOnPublicHolidays: clinic => clinic.publicHolidays && !clinic.publicHolidays.includes('Closed'),
-	isOpen24Hours: clinic => ([
-		clinic.monFri,
-		clinic.sat,
-		clinic.sun,
-		clinic.publicHolidays,
-		clinic.clinicRemarks
-	].find(v => v && (v.includes('24 Hour') || v.includes('24 Hr')))),
-	all: Boolean,
-}
+	const filterAndShow = filterFn => {
+		mapMarkers
+			.then(markers => {
+				markers.forEach(marker => marker.setVisible(false))
+				return markers
+			})
+			.then(markers =>
+				markers.filter(marker => filterFns[filterFn](marker.clinic)))
+				.then(showMarkers)
+				.then(updateVisibleClinics)
+	}
 
-function showMarkers(markers) {
-	markers.forEach(marker => marker.setVisible(true))
-	updateVisibleClinics(markers)
-}
+	const createMap = () => new google.maps.Map(document.getElementById('map'), {
+		zoom: 11,
+		center: SINGAPORE_POSITION
+	})
 
-function filterAndShow(filterFn, markers) {
-	markers.forEach(marker => marker.setVisible(false))
-	showMarkers(markers.filter(marker => filterFns[filterFn](marker.clinic)))
-}
+	// Clinics list
+	const ClinicItem = clinic => `
+		<li>
+			<p class="clinic-name">${clinic.clinicName}</p>
+			<p class="clinic-address">${address(clinic).join(', ')}</p>
+		</li>
+	`
 
-const ClinicItem = clinic => `
-	<li>
-		<p class="clinic-name">${clinic.clinicName}</p>
-		<p class="clinic-address">${address(clinic).join(', ')}</p>
-	</li>
-`
+	const updateVisibleClinics = markers => {
+		const visibleClinics = markers.map(marker => marker.clinic)
 
-function updateVisibleClinics(markers) {
-	const visibleClinics = markers
-		.filter(marker => marker.getVisible())
-		.map(marker => marker.clinic)
+		document.querySelector('#clinics').innerHTML = visibleClinics.map(ClinicItem).join('')
+	}
 
-	document.querySelector('#clinics').innerHTML = visibleClinics.map(ClinicItem).join('')
-}
+	// Init
+	googleMapsInitialised
+		.then(createMap)
+		.then(addMarkers)
+		.then(showMarkers)
+		.then(updateVisibleClinics)
+
+	return {
+		resolveMapInitialised,
+		filterAndShow,
+	}
+})()
