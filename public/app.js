@@ -1,3 +1,5 @@
+const IS_TEST_ENV = location.href.indexOf('env=test') !== -1
+
 function initMap() {
 	const singapore = {lat: 1.3554, lng: 103.8677};
 	const map = new google.maps.Map(document.getElementById('map'), {
@@ -12,7 +14,8 @@ function initMap() {
 		.then(clinics => clinics.map(clinic => new google.maps.Marker({
 			clinic,
 			position: clinic.position,
-			map: map
+			map: map,
+			optimized: !IS_TEST_ENV,
 		}))).then(markers => {
 			window.markers = markers
 			markers.forEach(marker => {
