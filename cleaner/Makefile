@@ -1,16 +1,32 @@
 SHELL := /bin/bash
 
-listing-with-positions.json: listing.json
-	cat listing.json | ./add-positions.cljs > listing-with-positions.json
+clinics.json.gz: clinics.json
+	gzip --stdout --best clinics.json > clinics.json.gz
 
-listing.json: listing.csv
-	csvjson listing.csv > listing.json
+clinics.json: clinics-without-positions.json positions.json
+	./merge.cljs clinics-without-positions.json positions.json > clinics.json
 
-listing.csv: listing-with-formatted-headers.csv
-	csvcut -C 17 listing-with-formatted-headers.csv > listing.csv
+positions.json: clinics-without-positions.json
+	# cat clinics-without-positions.json | ./get-positions.cljs > positions.json
+	touch positions.json
 
-listing-with-formatted-headers.csv: listing-raw.csv
-	cat <(echo 'sN,zone,estate,clinicName,blk,roadName,unitNo,buildingName,postalCode,phone,fax,monFri,sat,sun,publicHolidays,clinicRemarks,') <(csvcut -K 8 test2.csv) > listing-with-formatted-headers.csv
+clinics-without-positions.json: clinics-dirty.json
+	cat clinics-dirty.json | ./clean-numbers.cljs > clinics-without-positions.json
 
-listing-raw.csv: listing.xls
-	in2csv listing.xls > listing-raw.csv
+clinics-dirty.json: clinics.csv
+	csvjson --blank clinics.csv > clinics-dirty.json
+
+clinics.csv: clinics-header-and-data.csv
+	csvcut --not-columns 17 clinics-header-and-data.csv > clinics.csv
+
+clinics-header-and-data.csv: clinics-data-rows.csv
+	cat <(echo 'id,zone,estate,clinicName,blk,roadName,unitNo,buildingName,postalCode,phone,fax,monFri,sat,sun,publicHolidays,clinicRemarks,') clinics-data-rows.csv > clinics-header-and-data.csv
+
+clinics-data-rows.csv: clinics-raw.csv
+	csvgrep --columns 1 --regex '^[0-9]+\.?[0-9]*$$' clinics-raw.csv | tail -n +2 > clinics-data-rows.csv
+
+clinics-raw.csv: clinics.xls
+	in2csv clinics.xls > clinics-raw.csv
+
+clean:
+	rm -f *.json *.csv *.gz
