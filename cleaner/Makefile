@@ -7,8 +7,7 @@ clinics.json: clinics-without-positions.json positions.json
 	./merge.cljs clinics-without-positions.json positions.json > clinics.json
 
 positions.json: clinics-without-positions.json
-	# cat clinics-without-positions.json | ./get-positions.cljs > positions.json
-	touch positions.json
+	cat clinics-without-positions.json | ./get-positions.cljs > positions.json
 
 clinics-without-positions.json: clinics-dirty.json
 	cat clinics-dirty.json | ./clean-numbers.cljs > clinics-without-positions.json
