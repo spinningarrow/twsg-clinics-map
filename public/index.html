@@ -9,8 +9,6 @@
 		<link rel="stylesheet" href="/app.css">
 	</head>
 	<body>
-		<div id="map"></div>
-
 		<div id="control-panel">
 			<div class="control-panel-actions">
 				<select autocomplete="off" onchange="clinicsMap.filterAndShow(event.target.value)" id="js-filter-dropdown">
@@ -27,6 +25,8 @@
 
 			<ul id="clinics" class="clinics-list"></ul>
 		</div>
+
+		<div id="map"></div>
 
 		<script src="/app.js"></script>
 		<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAn5Nt8e_rYahYmraxZSc5quaS0h4RfNwI&callback=clinicsMap.resolveMapInitialised"></script>
