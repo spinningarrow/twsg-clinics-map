@@ -5,18 +5,19 @@ body {
 
 #map {
 	width: 100vw;
-	height: calc(100vh - 4rem);
+	height: 100vh;
 	background-color: grey;
 }
 
 #control-panel {
-	background: #4177b9;
+	background: hsla(50, 31%, 92%, 0.95);
+	border-radius: 10px 10px 0 0;
 	bottom: 0;
+	box-shadow: 0 0 15px 0 hsl(0, 0%, 60%);
 	box-sizing: border-box;
-	color: #ddd;
+	color: hsla(50, 43%, 24%, 1);
 	height: 4rem;
 	left: 0;
-	padding-top: 0.5rem;
 	position: fixed;
 	right: 0;
 	transition: height 0.2s;
@@ -34,13 +35,13 @@ body {
 	flex-wrap: nowrap;
 	font-size: 2rem;
 	justify-content: space-between;
-	padding: 0 0.25rem;
+	padding: 0.25rem;
 }
 
 .control-panel-actions .action {
-	color: white;
+	color: hsla(50, 43%, 24%, 1);
+	font-size: 1rem;
 	padding: 0 0.5rem;
-	text-decoration: none;
 }
 
 
@@ -78,15 +79,16 @@ body {
 }
 
 .clinics-list .clinic-address {
-    margin: 0;
+    color: hsl(50, 20%, 60%);
     font-size: small;
-    color: #a2b6d0;
+    margin: 0;
 }
 
 .clinics-list li {
-    padding: 0.5rem 0.25rem;
+	border-bottom: 1px dotted hsl(50, 30%, 70%);
+    padding: 0.5rem;
 }
 
-.clinics-list li:nth-child(odd) {
-    background: #38649c;
+.clinics-list li:hover {
+	background: hsla(50, 31%, 88%, 1);
 }
