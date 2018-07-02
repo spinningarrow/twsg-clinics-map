@@ -1,6 +1,15 @@
 #!/usr/bin/env planck
 
-(require '[planck.core :refer [slurp *in*]])
+(require '[planck.core :refer [slurp *in*]]
+         '[planck.shell :refer [sh]])
+
+(defn read-env
+  [key]
+  {:post [(not (nil? %))]}
+  (->> (sh "env")
+      :out
+      (re-find (re-pattern (str key "=(.+)\n")))
+      second))
 
 (defn json->clj
   [json]
@@ -15,7 +24,8 @@
       JSON.stringify))
 
 (def api-endpoint (str "https://maps.googleapis.com/maps/api/geocode/json"
-                       "?key=AIzaSyAn5Nt8e_rYahYmraxZSc5quaS0h4RfNwI"))
+                       "?key="
+                       (read-env "GEOCODING_API_KEY")))
 
 (defn api-endpoint-with-address
   [address]
