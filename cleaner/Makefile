@@ -24,8 +24,8 @@ clinics-header-and-data.csv: clinics-data-rows.csv
 clinics-data-rows.csv: clinics-raw.csv
 	csvgrep --columns 1 --regex '^[0-9]+\.?[0-9]*$$' clinics-raw.csv | tail -n +2 > clinics-data-rows.csv
 
-clinics-raw.csv: clinics.xls
-	in2csv clinics.xls > clinics-raw.csv
+clinics-raw.csv: clinics.xlsx
+	in2csv clinics.xlsx > clinics-raw.csv
 
 clean:
 	rm -f *.json *.csv *.gz
