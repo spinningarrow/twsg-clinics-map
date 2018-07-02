@@ -65,12 +65,12 @@ ${clinicRemarks ? 'Remarks: ' + clinicRemarks : ''}`
 	}
 
 	// Map-related functions
-	const onMarkerClick = (clinicsMap, marker) => () => {
-		if (mapInfoWindow) mapInfoWindow.close()
-		else mapInfoWindow = new google.maps.InfoWindow()
+	const onMarkerClick = (clinicsMap, { clinic: { id: clinicId }}) => () => {
+		selectMarker(clinicId - 1, { shouldFocus: false })
 
-		mapInfoWindow.setContent(infoWindowContent(marker.clinic))
-		mapInfoWindow.open(clinicsMap, marker)
+		const clinicsItem = document.querySelector(`[data-clinic-id="${clinicId}"]`)
+		const clinicsElement = document.querySelector('#clinics')
+		selectClinicsItem(clinicsElement, clinicsItem, { shouldAnimateScroll: false })
 	}
 
 	const addMarkers = clinicsMap => fetch(CLINICS_DATA_URI)
@@ -144,17 +144,36 @@ ${clinicRemarks ? 'Remarks: ' + clinicRemarks : ''}`
 		document.querySelector('#clinics').innerHTML = visibleClinics.map(ClinicItem).join('')
 	}
 
+	const selectClinicsItem = (clinicsElement, item, { shouldAnimateScroll = true } = {}) => {
+		clinicsElement.querySelectorAll('li').forEach(element =>
+			element.classList.remove('selected')
+		)
+		item.classList.toggle('selected')
+		item.scrollIntoView({ behavior: shouldAnimateScroll ? 'smooth' : 'instant' })
+	}
+
+	const selectMarker = async (markerIndex, { shouldFocus = true } = {}) => {
+		const markers = await mapMarkers
+		markers.forEach(marker => marker.setAnimation(null))
+		const marker = markers[markerIndex]
+		marker.setAnimation(google.maps.Animation.BOUNCE)
+
+		if (shouldFocus) {
+			marker.map.setZoom(15)
+			marker.map.setCenter(marker.position)
+		}
+	}
+
 	const addClinicSelectionListener = () => {
 		const clinicsElement = document.querySelector('#clinics')
 
-		clinicsElement.addEventListener('click', async event => {
+		clinicsElement.addEventListener('click', event => {
 			if (event.target.tagName !== 'LI') return
 
-			clinicsElement.querySelectorAll('li').forEach(element =>
-				element.classList.remove('selected')
-			)
-			event.target.classList.toggle('selected')
-			event.target.scrollIntoView({ behavior: 'smooth' })
+			selectClinicsItem(clinicsElement, event.target)
+
+			const markerIndex = parseInt(event.target.dataset.clinicId) - 1
+			selectMarker(markerIndex)
 		})
 	}
 
