@@ -66,6 +66,7 @@ ${clinicRemarks ? 'Remarks: ' + clinicRemarks : ''}`
 
 	// Map-related functions
 	const onMarkerClick = (clinicsMap, { clinic: { id: clinicId }}) => () => {
+		location.hash = '#control-panel'
 		selectMarker(clinicId - 1, { shouldFocus: false })
 
 		const clinicsItem = document.querySelector(`[data-clinic-id="${clinicId}"]`)
