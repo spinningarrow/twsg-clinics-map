@@ -111,7 +111,15 @@ ${clinicRemarks ? 'Remarks: ' + clinicRemarks : ''}`
 
 	const createMap = () => new google.maps.Map(document.getElementById('map'), {
 		zoom: 11,
-		center: SINGAPORE_POSITION
+		center: SINGAPORE_POSITION,
+		streetViewControl: true,
+		streetViewControlOptions: {
+			position: google.maps.ControlPosition.RIGHT_TOP,
+		},
+		zoomControl: true,
+		zoomControlOptions: {
+			position: google.maps.ControlPosition.RIGHT_TOP,
+		}
 	})
 
 	// Clinics list
