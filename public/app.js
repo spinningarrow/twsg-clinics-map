@@ -160,7 +160,9 @@ ${clinicRemarks ? 'Remarks: ' + clinicRemarks : ''}`
 
 		if (shouldFocus) {
 			marker.map.setZoom(15)
-			marker.map.setCenter(marker.position)
+			if (!marker.map.getBounds().contains(marker.getPosition())) {
+				marker.map.setCenter(marker.getPosition())
+			}
 		}
 	}
 
