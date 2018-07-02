@@ -124,9 +124,17 @@ ${clinicRemarks ? 'Remarks: ' + clinicRemarks : ''}`
 
 	// Clinics list
 	const ClinicItem = clinic => `
-		<li>
+		<li data-clinic-id="${clinic.id}">
 			<p class="clinic-name">${clinic.clinicName}</p>
 			<p class="clinic-address">${address(clinic).join(', ')}</p>
+			<div class="more-info">
+				Phone: ${clinic.phone}<br>
+				Mon-Fri: ${clinic.monFri}<br>
+				Sat: ${clinic.sat}<br>
+				Sun: ${clinic.sun}<br>
+				Public Holidays: ${clinic.publicHolidays}<br>
+				${clinic.clinicRemarks ? 'Remarks: ' + clinic.clinicRemarks : ''}
+			</div>
 		</li>
 	`
 
@@ -136,12 +144,27 @@ ${clinicRemarks ? 'Remarks: ' + clinicRemarks : ''}`
 		document.querySelector('#clinics').innerHTML = visibleClinics.map(ClinicItem).join('')
 	}
 
+	const addClinicSelectionListener = () => {
+		const clinicsElement = document.querySelector('#clinics')
+
+		clinicsElement.addEventListener('click', async event => {
+			if (event.target.tagName !== 'LI') return
+
+			clinicsElement.querySelectorAll('li').forEach(element =>
+				element.classList.remove('selected')
+			)
+			event.target.classList.toggle('selected')
+			event.target.scrollIntoView({ behavior: 'smooth' })
+		})
+	}
+
 	// Init
 	googleMapsInitialised
 		.then(createMap)
 		.then(addMarkers)
 		.then(showMarkers)
 		.then(updateVisibleClinics)
+		.then(addClinicSelectionListener)
 
 	return {
 		resolveMapInitialised,

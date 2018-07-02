@@ -72,23 +72,42 @@ body {
 	-webkit-overflow-scrolling: touch;
 }
 
-.clinics-list .clinic-name {
-    font-size: 1rem;
-    margin: 0;
-    font-weight: normal;
-}
-
-.clinics-list .clinic-address {
-    color: hsl(50, 20%, 60%);
-    font-size: small;
-    margin: 0;
-}
-
 .clinics-list li {
 	border-bottom: 1px dotted hsl(50, 30%, 70%);
+	cursor: pointer;
     padding: 0.5rem;
 }
 
 .clinics-list li:hover {
 	background: hsla(50, 31%, 88%, 1);
+}
+
+.clinics-list li.selected {
+	background: hsla(50, 31%, 75%, 1);
+}
+
+.clinics-list li > * {
+	pointer-events: none;
+}
+
+.clinics-list .clinic-name {
+	font-size: 1rem;
+	font-weight: normal;
+	margin: 0;
+}
+
+.clinics-list .clinic-address {
+	color: hsl(50, 20%, 30%);
+	font-size: small;
+	margin: 0;
+}
+
+.clinics-list .more-info {
+	color: hsl(50, 20%, 30%);
+	display: none;
+	font-size: small;
+}
+
+.clinics-list .selected .more-info {
+	display: initial;
 }
