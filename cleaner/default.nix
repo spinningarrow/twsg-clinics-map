@@ -5,5 +5,6 @@ in pkgs.stdenv.mkDerivation rec {
 
   buildInputs = with pkgs; [
     python36Packages.csvkit
+    jq
   ];
 }
