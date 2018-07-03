@@ -61,6 +61,17 @@ ${clinicRemarks ? 'Remarks: ' + clinicRemarks : ''}`
 			clinic.publicHolidays,
 			clinic.clinicRemarks
 		].find(v => v && (v.includes('24 Hour') || v.includes('24 Hr')))),
+		isOpenNow: clinic => {
+			const now = new Date()
+			const timing = now.getHours() * 100 + now.getMinutes()
+			const day = now.getDay()
+			// TODO check for public holidays
+			const intervals = clinic.timings.days[day]
+
+			// TODO check for intervals like [1830, 0]
+			return intervals &&
+				intervals.filter(([start, end]) => timing >= start && timing <= end).length
+		},
 		all: Boolean,
 	}
 

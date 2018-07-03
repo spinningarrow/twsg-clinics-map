@@ -3,8 +3,11 @@ SHELL := /bin/bash
 clinics.json.gz: clinics.json
 	gzip --stdout --best clinics.json > clinics.json.gz
 
-clinics.json: clinics-without-positions.json positions.json
-	./merge.cljs clinics-without-positions.json positions.json > clinics.json
+clinics.json: clinics-with-positions.json
+	cat clinics-with-positions.json | ./add-timings.cljs > clinics.json
+
+clinics-with-positions.json: clinics-without-positions.json positions.json
+	./merge.cljs clinics-without-positions.json positions.json > clinics-with-positions.json
 
 positions.json: clinics-without-positions.json
 	cat clinics-without-positions.json | ./get-positions.cljs > positions.json
