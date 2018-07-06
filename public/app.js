@@ -76,7 +76,39 @@ ${clinicRemarks ? 'Remarks: ' + clinicRemarks : ''}`
 	}
 
 	// Map-related functions
-	const onMarkerClick = (clinicsMap, { clinic: { id: clinicId }}) => () => {
+	const showCurrentLocation = map => {
+		navigator.geolocation.getCurrentPosition(({ coords: { latitude: lat, longitude: lng } }) => {
+			const position = {
+				lat,
+				lng,
+			}
+
+			new google.maps.InfoWindow({
+				position,
+				content: 'You are here',
+			}).open(map)
+
+			new google.maps.Marker({
+				position,
+				map,
+				icon: {
+					path: google.maps.SymbolPath.CIRCLE,
+					scale: 6,
+					fillColor: 'dodgerblue',
+					fillOpacity: 1,
+					strokeColor: 'white',
+					strokeWeight: 1,
+				},
+			});
+
+			map.setCenter(position)
+			map.setZoom(15)
+		})
+
+		return map
+	}
+
+	const onMarkerClick = (clinicsMap, { clinic: { id: clinicId } }) => () => {
 		location.hash = '#control-panel'
 		selectMarker(clinicId - 1, { shouldFocus: false })
 
@@ -117,8 +149,8 @@ ${clinicRemarks ? 'Remarks: ' + clinicRemarks : ''}`
 			})
 			.then(markers =>
 				markers.filter(marker => filterFns[filterFn](marker.clinic)))
-				.then(showMarkers)
-				.then(updateVisibleClinics)
+			.then(showMarkers)
+			.then(updateVisibleClinics)
 	}
 
 	const createMap = () => new google.maps.Map(document.getElementById('map'), {
@@ -194,6 +226,7 @@ ${clinicRemarks ? 'Remarks: ' + clinicRemarks : ''}`
 	// Init
 	googleMapsInitialised
 		.then(createMap)
+		.then(showCurrentLocation)
 		.then(addMarkers)
 		.then(showMarkers)
 		.then(updateVisibleClinics)
