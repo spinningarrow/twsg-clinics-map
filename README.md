@@ -2,13 +2,21 @@
 
 A map of all the panel clinics for TWSG.
 
-## Web (`/public`)
+## Develop
 
-### Develop
+This repo contains several sub-projects: 
 
-Note: The development tools require [Node.js][]; install it manually or use
-[Nix][] to install. A `default.nix` and `.envrc` is included for [direnv][] and
-`nix-shell` support.
+- `/public`: the main web app
+- `/cleaner`: to build the JSON file with the clinics data
+- `/test`: end-to-end tests
+
+To install dependencies of the sub-projects, use `nix-shell` from [Nix][]
+(optionally with [direnv][]) or refer to the `default.nix` file in each project
+to see which dependencies to install manually.
+
+For specific instructions for each sub-project, see below.
+
+## `/public`
 
 1. Install the development tools (linting, code formatting and live server):
 
@@ -24,7 +32,7 @@ Note: The development tools require [Node.js][]; install it manually or use
    Open `localhost:8080` in your browser for development (and not
    `127.0.0.1:8080` or something else) to get Google Maps to load properly.
 
-## Cleaner (`/cleaner`)
+## `/cleaner`
 
 1. Download (or copy from Dropbox) the Excel file containing the clinic details
 
