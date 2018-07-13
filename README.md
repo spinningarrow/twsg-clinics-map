@@ -2,7 +2,7 @@
 
 A map of all the panel clinics for TWSG.
 
-## Web
+## Web (`/public`)
 
 ### Develop
 
@@ -21,10 +21,10 @@ Note: The development tools require [Node.js][]; install it manually or use
 
        npm run start:dev
 
-   Make sure that browser points to `localhost:8080` for development (and not
-   `127.0.0.1:8080` or something else) for Google Maps to load properly.
+   Open `localhost:8080` in your browser for development (and not
+   `127.0.0.1:8080` or something else) to get Google Maps to load properly.
 
-## Cleaner
+## Cleaner (`/cleaner`)
 
 1. Download (or copy from Dropbox) the Excel file containing the clinic details
 
