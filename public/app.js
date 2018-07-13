@@ -1,33 +1,47 @@
 window.clinicsMap = (() => {
 	const IS_TEST_ENV = location.href.indexOf('env=test') !== -1
-	const CLINICS_DATA_URI = 'https://s3-ap-southeast-1.amazonaws.com/clinic-mapper/clinics.json.gz'
+	const CLINICS_DATA_URI =
+		'https://s3-ap-southeast-1.amazonaws.com/clinic-mapper/clinics.json.gz'
 	const SINGAPORE_POSITION = { lat: 1.3554, lng: 103.8677 }
 
 	let resolveMapInitialised
 	let resolveMarkers
 
-	const googleMapsInitialised = new Promise(resolve =>
-		resolveMapInitialised = resolve)
-	const mapMarkers = new Promise(resolve => resolveMarkers = resolve)
+	const googleMapsInitialised = new Promise(
+		resolve => (resolveMapInitialised = resolve)
+	)
+	const mapMarkers = new Promise(resolve => (resolveMarkers = resolve))
 
 	// Helpers
-	const address = ({ blk, roadName, unitNo, buildingName, zone, postalCode }) => [
+	const address = ({
+		blk,
+		roadName,
+		unitNo,
+		buildingName,
+		zone,
+		postalCode,
+	}) => [
 		`${blk} ${roadName}`.trim(),
 		`${unitNo} ${buildingName}`.trim(),
-		`${zone.match(/malaysia/i) ? 'Malaysia' : 'Singapore'} ${postalCode}`.trim(),
+		`${
+			zone.match(/malaysia/i) ? 'Malaysia' : 'Singapore'
+		} ${postalCode}`.trim(),
 	]
 
 	const filterFns = {
-		isOpenOnSaturdays: clinic => clinic.sat && !clinic.sat.includes('Closed'),
+		isOpenOnSaturdays: clinic =>
+			clinic.sat && !clinic.sat.includes('Closed'),
 		isOpenOnSundays: clinic => clinic.sun && !clinic.sun.includes('Closed'),
-		isOpenOnPublicHolidays: clinic => clinic.publicHolidays && !clinic.publicHolidays.includes('Closed'),
-		isOpen24Hours: clinic => ([
-			clinic.monFri,
-			clinic.sat,
-			clinic.sun,
-			clinic.publicHolidays,
-			clinic.clinicRemarks
-		].find(v => v && (v.includes('24 Hour') || v.includes('24 Hr')))),
+		isOpenOnPublicHolidays: clinic =>
+			clinic.publicHolidays && !clinic.publicHolidays.includes('Closed'),
+		isOpen24Hours: clinic =>
+			[
+				clinic.monFri,
+				clinic.sat,
+				clinic.sun,
+				clinic.publicHolidays,
+				clinic.clinicRemarks,
+			].find(v => v && (v.includes('24 Hour') || v.includes('24 Hr'))),
 		isOpenNow: clinic => {
 			const now = new Date()
 			const timing = now.getHours() * 100 + now.getMinutes()
@@ -36,41 +50,47 @@ window.clinicsMap = (() => {
 			const intervals = clinic.timings.days[day]
 
 			// TODO check for intervals like [1830, 0]
-			return intervals &&
-				intervals.filter(([start, end]) => timing >= start && timing <= end).length
+			return (
+				intervals &&
+				intervals.filter(
+					([start, end]) => timing >= start && timing <= end
+				).length
+			)
 		},
 		all: Boolean,
 	}
 
 	// Map-related functions
 	const showCurrentLocation = map => {
-		navigator.geolocation.getCurrentPosition(({ coords: { latitude: lat, longitude: lng } }) => {
-			const position = {
-				lat,
-				lng,
+		navigator.geolocation.getCurrentPosition(
+			({ coords: { latitude: lat, longitude: lng } }) => {
+				const position = {
+					lat,
+					lng,
+				}
+
+				new window.google.maps.InfoWindow({
+					position,
+					content: 'You are here',
+				}).open(map)
+
+				new window.google.maps.Marker({
+					position,
+					map,
+					icon: {
+						path: window.google.maps.SymbolPath.CIRCLE,
+						scale: 6,
+						fillColor: 'dodgerblue',
+						fillOpacity: 1,
+						strokeColor: 'white',
+						strokeWeight: 1,
+					},
+				})
+
+				map.setCenter(position)
+				map.setZoom(15)
 			}
-
-			new window.google.maps.InfoWindow({
-				position,
-				content: 'You are here',
-			}).open(map)
-
-			new window.google.maps.Marker({
-				position,
-				map,
-				icon: {
-					path: window.google.maps.SymbolPath.CIRCLE,
-					scale: 6,
-					fillColor: 'dodgerblue',
-					fillOpacity: 1,
-					strokeColor: 'white',
-					strokeWeight: 1,
-				},
-			})
-
-			map.setCenter(position)
-			map.setZoom(15)
-		})
+		)
 
 		return map
 	}
@@ -79,29 +99,42 @@ window.clinicsMap = (() => {
 		location.hash = '#control-panel'
 		selectMarker(clinicId - 1, { shouldFocus: false })
 
-		const clinicsItem = document.querySelector(`[data-clinic-id="${clinicId}"]`)
+		const clinicsItem = document.querySelector(
+			`[data-clinic-id="${clinicId}"]`
+		)
 		const clinicsElement = document.querySelector('#clinics')
-		selectClinicsItem(clinicsElement, clinicsItem, { shouldAnimateScroll: false })
+		selectClinicsItem(clinicsElement, clinicsItem, {
+			shouldAnimateScroll: false,
+		})
 	}
 
-	const addMarkers = clinicsMap => fetch(CLINICS_DATA_URI)
-		.then(response => response.json())
-		.then(clinics => clinics.map(clinic => new window.google.maps.Marker({
-			clinic,
-			position: clinic.position,
-			map: clinicsMap,
-			optimized: !IS_TEST_ENV,
-		}))).then(markers => {
-			resolveMarkers(markers)
+	const addMarkers = clinicsMap =>
+		fetch(CLINICS_DATA_URI)
+			.then(response => response.json())
+			.then(clinics =>
+				clinics.map(
+					clinic =>
+						new window.google.maps.Marker({
+							clinic,
+							position: clinic.position,
+							map: clinicsMap,
+							optimized: !IS_TEST_ENV,
+						})
+				)
+			)
+			.then(markers => {
+				resolveMarkers(markers)
 
-			markers.forEach(marker => window.google.maps.event.addListener(
-				marker,
-				'click',
-				onMarkerClick(clinicsMap, marker)
-			))
+				markers.forEach(marker =>
+					window.google.maps.event.addListener(
+						marker,
+						'click',
+						onMarkerClick(clinicsMap, marker)
+					)
+				)
 
-			return markers
-		})
+				return markers
+			})
 
 	const showMarkers = markers => {
 		markers.forEach(marker => marker.setVisible(true))
@@ -115,23 +148,25 @@ window.clinicsMap = (() => {
 				return markers
 			})
 			.then(markers =>
-				markers.filter(marker => filterFns[filterFn](marker.clinic)))
+				markers.filter(marker => filterFns[filterFn](marker.clinic))
+			)
 			.then(showMarkers)
 			.then(updateVisibleClinics)
 	}
 
-	const createMap = () => new window.google.maps.Map(document.getElementById('map'), {
-		zoom: 11,
-		center: SINGAPORE_POSITION,
-		streetViewControl: true,
-		streetViewControlOptions: {
-			position: window.google.maps.ControlPosition.RIGHT_TOP,
-		},
-		zoomControl: true,
-		zoomControlOptions: {
-			position: window.google.maps.ControlPosition.RIGHT_TOP,
-		}
-	})
+	const createMap = () =>
+		new window.google.maps.Map(document.getElementById('map'), {
+			zoom: 11,
+			center: SINGAPORE_POSITION,
+			streetViewControl: true,
+			streetViewControlOptions: {
+				position: window.google.maps.ControlPosition.RIGHT_TOP,
+			},
+			zoomControl: true,
+			zoomControlOptions: {
+				position: window.google.maps.ControlPosition.RIGHT_TOP,
+			},
+		})
 
 	// Clinics list
 	const ClinicItem = clinic => `
@@ -152,15 +187,23 @@ window.clinicsMap = (() => {
 	const updateVisibleClinics = markers => {
 		const visibleClinics = markers.map(marker => marker.clinic)
 
-		document.querySelector('#clinics').innerHTML = visibleClinics.map(ClinicItem).join('')
+		document.querySelector('#clinics').innerHTML = visibleClinics
+			.map(ClinicItem)
+			.join('')
 	}
 
-	const selectClinicsItem = (clinicsElement, item, { shouldAnimateScroll = true } = {}) => {
-		clinicsElement.querySelectorAll('li').forEach(element =>
-			element.classList.remove('selected')
-		)
+	const selectClinicsItem = (
+		clinicsElement,
+		item,
+		{ shouldAnimateScroll = true } = {}
+	) => {
+		clinicsElement
+			.querySelectorAll('li')
+			.forEach(element => element.classList.remove('selected'))
 		item.classList.toggle('selected')
-		item.scrollIntoView({ behavior: shouldAnimateScroll ? 'smooth' : 'instant' })
+		item.scrollIntoView({
+			behavior: shouldAnimateScroll ? 'smooth' : 'instant',
+		})
 	}
 
 	const selectMarker = async (markerIndex, { shouldFocus = true } = {}) => {

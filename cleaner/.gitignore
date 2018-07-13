@@ -2,4 +2,4 @@
 *.csv
 *.gz
 *.xls
-**/node_modules
+*.xlsx
