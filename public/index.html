@@ -11,7 +11,7 @@
 	<body>
 		<div id="control-panel">
 			<div class="control-panel-actions">
-				<select autocomplete="off" onchange="clinicsMap.filterAndShow(event.target.value)" id="js-filter-dropdown">
+				<select autocomplete="off" id="clinics-filter">
 					<option value="all">All</option>
 					<option value="isOpenNow">Open Now (beta)</option>
 					<option value="isOpenOnSaturdays">Open on Saturdays</option>
@@ -29,7 +29,12 @@
 
 		<div id="map"></div>
 
-		<script src="/app.js"></script>
-		<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAn5Nt8e_rYahYmraxZSc5quaS0h4RfNwI&callback=clinicsMap.resolveMapInitialised"></script>
+		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAn5Nt8e_rYahYmraxZSc5quaS0h4RfNwI"></script>
+		<script async type="module">
+			import { init } from './app.js'
+			const clinicsElement = document.querySelector('#clinics')
+			const clinicsFilterElement = document.querySelector('#clinics-filter')
+			init(clinicsElement, clinicsFilterElement)
+		</script>
 	</body>
 </html>
