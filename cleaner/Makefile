@@ -1,5 +1,7 @@
 SHELL := /bin/bash
 
+.PHONY: test
+
 clinics.json.gz: clinics.json
 	gzip --stdout --best clinics.json > clinics.json.gz
 
@@ -24,11 +26,15 @@ clinics.csv: clinics-header-and-data.csv
 clinics-header-and-data.csv: clinics-data-rows.csv
 	cat <(echo 'id,zone,estate,clinicName,blk,roadName,unitNo,buildingName,postalCode,phone,fax,monFri,sat,sun,publicHolidays,clinicRemarks,') clinics-data-rows.csv > clinics-header-and-data.csv
 
-clinics-data-rows.csv: clinics-raw.csv
+out/clinics-data-rows.csv: out/clinics-raw.csv
 	csvgrep --columns 1 --regex '^[0-9]+\.?[0-9]*$$' clinics-raw.csv | tail -n +2 > clinics-data-rows.csv
 
-clinics-raw.csv: clinics.xls
-	in2csv clinics.xls > clinics-raw.csv
+out/clinics-raw.csv: clinics.xlsx
+	@mkdir -p out
+	in2csv clinics.xlsx > out/clinics-raw.csv
 
 clean:
 	rm -f *.json *.csv *.gz
+
+test:
+	planck -c .. test_runner.cljs

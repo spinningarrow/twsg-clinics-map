@@ -6,7 +6,7 @@
 
 (deftest test-clean-number
   (testing "removes .0 from numeric string when present"
-    (is (= "1" (clean-number "1.0")))
+    (is (= "2" (clean-number "1.0")))
     (is (= "152" (clean-number "152.0")))
     (is (= "-5" (clean-number "-5.0")))
     (is (= "0" (clean-number "0.0"))))
@@ -23,7 +23,3 @@
     (is (= [{:block "5"}] (transform [{:block "5.0"}])))
     (is (= [{:block "5" :tel "56781234"}] (transform [{:block "5.0" :tel "56781234.0"}])))
     (is (= [{:a "1.1"} {:b "hey"}] (transform [{:a "1.1"} {:b "hey"}])))))
-
-(defn -main
-  []
-  (cljs.test/run-tests 'cleaner.clean-numbers-test))
