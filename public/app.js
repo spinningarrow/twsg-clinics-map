@@ -1,9 +1,8 @@
-window.clinicsMap = (() => {
+const clinicsMap = (() => {
 	const IS_TEST_ENV = location.href.indexOf('env=test') !== -1
 	const CLINICS_DATA_URI = 'https://s3-ap-southeast-1.amazonaws.com/clinic-mapper/clinics.json.gz'
 	const SINGAPORE_POSITION = { lat: 1.3554, lng: 103.8677 }
 
-	let mapInfoWindow = null
 	let resolveMapInitialised
 	let resolveMarkers
 
@@ -17,38 +16,6 @@ window.clinicsMap = (() => {
 		`${unitNo} ${buildingName}`.trim(),
 		`${zone.match(/malaysia/i) ? 'Malaysia' : 'Singapore'} ${postalCode}`.trim(),
 	]
-
-	const infoWindowContent = clinic => {
-		const {
-			clinicName,
-			monFri,
-			sat,
-			sun,
-			publicHolidays,
-			clinicRemarks,
-			blk,
-			roadName,
-			unitNo,
-			buildingName,
-			postalCode,
-			phone,
-		} = clinic
-
-		const content = `
-${clinicName}
-${address(clinic).join('\n')}
-
-Phone: ${phone}
-
-Mon-Fri: ${monFri}
-Sat: ${sat}
-Sun: ${sun}
-Public Holidays: ${publicHolidays}
-
-${clinicRemarks ? 'Remarks: ' + clinicRemarks : ''}`
-
-		return content.trim().replace(/\n/g, '<br>')
-	}
 
 	const filterFns = {
 		isOpenOnSaturdays: clinic => clinic.sat && !clinic.sat.includes('Closed'),
@@ -87,7 +54,7 @@ ${clinicRemarks ? 'Remarks: ' + clinicRemarks : ''}`
 
 	const addMarkers = clinicsMap => fetch(CLINICS_DATA_URI)
 		.then(response => response.json())
-		.then(clinics => clinics.map(clinic => new google.maps.Marker({
+		.then(clinics => clinics.map(clinic => new window.google.maps.Marker({
 			clinic,
 			position: clinic.position,
 			map: clinicsMap,
@@ -95,7 +62,7 @@ ${clinicRemarks ? 'Remarks: ' + clinicRemarks : ''}`
 		}))).then(markers => {
 			resolveMarkers(markers)
 
-			markers.forEach(marker => google.maps.event.addListener(
+			markers.forEach(marker => window.google.maps.event.addListener(
 				marker,
 				'click',
 				onMarkerClick(clinicsMap, marker)
@@ -117,20 +84,20 @@ ${clinicRemarks ? 'Remarks: ' + clinicRemarks : ''}`
 			})
 			.then(markers =>
 				markers.filter(marker => filterFns[filterFn](marker.clinic)))
-				.then(showMarkers)
-				.then(updateVisibleClinics)
+			.then(showMarkers)
+			.then(updateVisibleClinics)
 	}
 
-	const createMap = () => new google.maps.Map(document.getElementById('map'), {
+	const createMap = () => new window.google.maps.Map(document.getElementById('map'), {
 		zoom: 11,
 		center: SINGAPORE_POSITION,
 		streetViewControl: true,
 		streetViewControlOptions: {
-			position: google.maps.ControlPosition.RIGHT_TOP,
+			position: window.google.maps.ControlPosition.RIGHT_TOP,
 		},
 		zoomControl: true,
 		zoomControlOptions: {
-			position: google.maps.ControlPosition.RIGHT_TOP,
+			position: window.google.maps.ControlPosition.RIGHT_TOP,
 		}
 	})
 
@@ -168,7 +135,7 @@ ${clinicRemarks ? 'Remarks: ' + clinicRemarks : ''}`
 		const markers = await mapMarkers
 		markers.forEach(marker => marker.setAnimation(null))
 		const marker = markers[markerIndex]
-		marker.setAnimation(google.maps.Animation.BOUNCE)
+		marker.setAnimation(window.google.maps.Animation.BOUNCE)
 
 		if (shouldFocus) {
 			marker.map.setZoom(15)
@@ -204,3 +171,5 @@ ${clinicRemarks ? 'Remarks: ' + clinicRemarks : ''}`
 		filterAndShow,
 	}
 })()
+
+window.clinicsMap = clinicsMap
