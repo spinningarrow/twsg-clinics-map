@@ -1,5 +1,7 @@
 SHELL := /bin/bash
 
+.PHONY: test
+
 clinics.json.gz: clinics.json
 	gzip --stdout --best clinics.json > clinics.json.gz
 
@@ -32,3 +34,6 @@ clinics-raw.csv: clinics.xls
 
 clean:
 	rm -f *.json *.csv *.gz
+
+test:
+	cd test && ./run-tests.sh
