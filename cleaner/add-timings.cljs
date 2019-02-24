@@ -25,13 +25,10 @@
 (def mon-fri-item-string "Mon, Tue, Thu & Fri:\n9.00am - 12.30pm,\n2.00pm - 4.30pm")
 (def mon-fri-string "Mon, Tue, Thu & Fri:\n9.00am - 12.30pm,\n2.00pm - 4.30pm\n\nWed:\n9.00am - 12.30pm")
 
-;; (def *old-mon-fri-pattern* #"(?s)(.+:.+(?:am|pm))(.+:.+)")
-(def *mon-fri-pattern* #"(?is).+?:(?:[^:]+(?:am|pm))")
-(def *timing-pattern* #"(?i)(\d{1,2})[.:](\d{2})(am|pm)")
-(def *days* ["Mon" "Tue" "Wed" "Thu" "Fri"])
-(def *days-pattern* #"(?i)Mon|Tue|Wed|Thu|Fri")
-
-;; (re-find (re-pattern (join "|" days)) mf2)
+(def mon-fri-pattern #"(?is).+?:(?:[^:]+(?:am|pm))")
+(def timing-pattern #"(?i)(\d{1,2})[.:](\d{2})(am|pm)")
+(def day-names ["Mon" "Tue" "Wed" "Thu" "Fri"])
+(def days-pattern #"(?i)Mon|Tue|Wed|Thu|Fri")
 
 (defn hours
   [hh meridiem]
@@ -46,7 +43,7 @@
 
 (defn timing
   [timing-string]
-  (when-let [[_ hh mm meridiem] (re-find *timing-pattern* timing-string)]
+  (when-let [[_ hh mm meridiem] (re-find timing-pattern timing-string)]
     (+ (minutes mm) (* (hours hh (.toLowerCase meridiem)) 100))))
 
 (defn timing-string-intervals
@@ -64,13 +61,13 @@
   [mon-fri-item-string]
   (let [[days intervals-string] (split mon-fri-item-string ":")
         result (timing-intervals intervals-string)]
-    (map (fn [day] (when (includes? days day) result)) *days*)))
+    (map (fn [day] (when (includes? days day) result)) day-names)))
 
 (defn mon-fri-timing-intervals
   [mon-fri-string]
-  (if-not (re-find *days-pattern* mon-fri-string)
+  (if-not (re-find days-pattern mon-fri-string)
     (repeat 5 (timing-intervals mon-fri-string))
-    (let [mon-fri-item-strings (re-seq *mon-fri-pattern* mon-fri-string)
+    (let [mon-fri-item-strings (re-seq mon-fri-pattern mon-fri-string)
           x (map mon-fri-item-intervals mon-fri-item-strings)]
       (apply map (fn [& args] (first (drop-while nil? args))) x))))
 
