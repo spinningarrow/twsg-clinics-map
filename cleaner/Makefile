@@ -27,7 +27,7 @@ clinics-header-and-data.csv: clinics-data-rows.csv
 	cat <(echo 'id,zone,estate,clinicName,blk,roadName,unitNo,buildingName,postalCode,phone,fax,monFri,sat,sun,publicHolidays,clinicRemarks,') clinics-data-rows.csv > clinics-header-and-data.csv
 
 clinics-data-rows.csv: clinics-raw.csv
-	csvgrep --columns 1 --regex '^[0-9]+\.?[0-9]*$$' clinics-raw.csv | tail -n +2 > clinics-data-rows.csv
+	csvgrep --no-header-row --columns 1 --regex '^[0-9]+\.?[0-9]*$$' clinics-raw.csv | tail -n +2 > clinics-data-rows.csv
 
 clinics-raw.csv: clinics.xlsx
 	in2csv clinics.xlsx > clinics-raw.csv
