@@ -26,10 +26,10 @@
 (def mon-fri-string "Mon, Tue, Thu & Fri:\n9.00am - 12.30pm,\n2.00pm - 4.30pm\n\nWed:\n9.00am - 12.30pm")
 
 ;; (def *old-mon-fri-pattern* #"(?s)(.+:.+(?:am|pm))(.+:.+)")
-(def *mon-fri-pattern* #"(?s).+?:(?:[^:]+(?:am|pm))")
-(def *timing-pattern* #"(\d{1,2})[.:](\d{2})(am|pm)")
+(def *mon-fri-pattern* #"(?is).+?:(?:[^:]+(?:am|pm))")
+(def *timing-pattern* #"(?i)(\d{1,2})[.:](\d{2})(am|pm)")
 (def *days* ["Mon" "Tue" "Wed" "Thu" "Fri"])
-(def *days-pattern* (re-pattern (join "|" *days*)))
+(def *days-pattern* #"(?i)Mon|Tue|Wed|Thu|Fri")
 
 ;; (re-find (re-pattern (join "|" days)) mf2)
 
@@ -47,7 +47,7 @@
 (defn timing
   [timing-string]
   (when-let [[_ hh mm meridiem] (re-find *timing-pattern* timing-string)]
-    (+ (minutes mm) (* (hours hh meridiem) 100))))
+    (+ (minutes mm) (* (hours hh (.toLowerCase meridiem)) 100))))
 
 (defn timing-string-intervals
   [intervals-string]

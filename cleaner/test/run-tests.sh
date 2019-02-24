@@ -38,4 +38,25 @@ test_add_timings() {
 	assertEquals 'public holidays' '[[700,1500],[1800,0]]' "$(echo "$actual" | jq -c .[0].timings.publicHolidays)"
 }
 
+test_add_timings_when_suffix_is_capitalised() {
+	input='[{
+		"id": 1,
+		"publicHolidays": "7.00AM - 3.00PM,\n6.00PM - 12.00AM",
+		"sat": "7.30AM - 1.00PM,\\n6.00PM - 12.00AM",
+		"monFri": "6.00AM - 1.00PM,\\n5.00PM - 12.00AM",
+		"sun": "7.00AM - 1.00PM,\\n6.00PM - 12.00AM"
+	}]'
+
+	actual="$(echo $input | ../add-timings.cljs)"
+
+	assertEquals 'sunday' '[[700,1300],[1800,0]]' "$(echo "$actual" | jq -c .[0].timings.days[0])"
+	assertEquals 'monday' '[[600,1300],[1700,0]]' "$(echo "$actual" | jq -c .[0].timings.days[1])"
+	assertEquals 'tuesday' '[[600,1300],[1700,0]]' "$(echo "$actual" | jq -c .[0].timings.days[2])"
+	assertEquals 'wednesday' '[[600,1300],[1700,0]]' "$(echo "$actual" | jq -c .[0].timings.days[3])"
+	assertEquals 'thursday' '[[600,1300],[1700,0]]' "$(echo "$actual" | jq -c .[0].timings.days[4])"
+	assertEquals 'friday' '[[600,1300],[1700,0]]' "$(echo "$actual" | jq -c .[0].timings.days[5])"
+	assertEquals 'saturday' '[[730,1300],[1800,0]]' "$(echo "$actual" | jq -c .[0].timings.days[6])"
+	assertEquals 'public holidays' '[[700,1500],[1800,0]]' "$(echo "$actual" | jq -c .[0].timings.publicHolidays)"
+}
+
 . ./shunit2
