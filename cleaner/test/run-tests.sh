@@ -77,4 +77,22 @@ test_add_timings_when_mon_fri_has_separate_days() {
 	assertEquals 'friday' '[[830,1215],[1400,1615],[1830,2030]]' "$(echo "$actual" | jq -c .[0].timings.days[5])"
 }
 
+test_add_timings_when_mon_fri_includes_day_range() {
+	input='[{
+		"id": 282,
+		"publicHolidays": "CLOSED",
+		"sat": "9.00AM - 12.00PM",
+		"monFri": "MON: \n8.30AM - 2.00PM \n\nTUE - FRI:\n8.30AM - 10.00PM",
+		"sun": "CLOSED"
+	}]'
+
+	actual="$(echo $input | ../add-timings.cljs)"
+
+	assertEquals 'monday' '[[830,1400]]' "$(echo "$actual" | jq -c .[0].timings.days[1])"
+	assertEquals 'tuesday' '[[830,2200]]' "$(echo "$actual" | jq -c .[0].timings.days[2])"
+	assertEquals 'wednesday' '[[830,2200]]' "$(echo "$actual" | jq -c .[0].timings.days[3])"
+	assertEquals 'thursday' '[[830,2200]]' "$(echo "$actual" | jq -c .[0].timings.days[4])"
+	assertEquals 'friday' '[[830,2200]]' "$(echo "$actual" | jq -c .[0].timings.days[5])"
+}
+
 . ./shunit2

@@ -29,6 +29,7 @@
 (def timing-pattern #"(?i)(\d{1,2})[.:](\d{2})(am|pm)")
 (def day-names ["mon" "tue" "wed" "thu" "fri"])
 (def days-pattern #"(?i)Mon|Tue|Wed|Thu|Fri")
+(def day-range-pattern #"(?i)(mon|tue|wed|thu|fri) - (mon|tue|wed|thu|fri)")
 
 (defn hours
   [hh meridiem]
@@ -56,6 +57,12 @@
   [intervals-string]
   (for [interval (timing-string-intervals intervals-string)]
     (map timing interval)))
+
+(defn explode-day-range
+  [day-range]
+  (if-let [[_ start-day end-day] (re-find day-range-pattern day-range)]
+    (subvec day-names (.indexOf day-names start-day) (inc (.indexOf day-names end-day)))
+    day-range))
 
 (defn mon-fri-item-intervals
   [mon-fri-item-string]
