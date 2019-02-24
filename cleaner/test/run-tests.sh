@@ -17,7 +17,7 @@ test_merge() {
 	assertEquals "$expected" "$actual"
 }
 
-test_add_timings() {
+test_add_timings_when_text_is_lowercase() {
 	input='[{
 		"id": 1,
 		"publicHolidays": "7.00am - 3.00pm,\n6.00pm - 12.00am",
@@ -38,7 +38,7 @@ test_add_timings() {
 	assertEquals 'public holidays' '[[700,1500],[1800,0]]' "$(echo "$actual" | jq -c .[0].timings.publicHolidays)"
 }
 
-test_add_timings_when_suffix_is_capitalised() {
+test_add_timings_when_text_is_uppercase() {
 	input='[{
 		"id": 1,
 		"publicHolidays": "7.00AM - 3.00PM,\n6.00PM - 12.00AM",
@@ -57,6 +57,24 @@ test_add_timings_when_suffix_is_capitalised() {
 	assertEquals 'friday' '[[600,1300],[1700,0]]' "$(echo "$actual" | jq -c .[0].timings.days[5])"
 	assertEquals 'saturday' '[[730,1300],[1800,0]]' "$(echo "$actual" | jq -c .[0].timings.days[6])"
 	assertEquals 'public holidays' '[[700,1500],[1800,0]]' "$(echo "$actual" | jq -c .[0].timings.publicHolidays)"
+}
+
+test_add_timings_when_mon_fri_has_separate_days() {
+	input='[{
+		"id": 282,
+		"publicHolidays": "CLOSED",
+		"sat": "9.00AM - 12.00PM",
+		"monFri": "MON, TUE, WED & FRI:\n8.30AM - 12.15PM, \n2.00PM - 4.15PM,\n6.30PM - 8.30PM\n\nTHU:\n8.30AM - 12.15PM,\n6.30PM - 9.30PM",
+		"sun": "CLOSED"
+	}]'
+
+	actual="$(echo $input | ../add-timings.cljs)"
+
+	assertEquals 'monday' '[[830,1215],[1400,1615],[1830,2030]]' "$(echo "$actual" | jq -c .[0].timings.days[1])"
+	assertEquals 'tuesday' '[[830,1215],[1400,1615],[1830,2030]]' "$(echo "$actual" | jq -c .[0].timings.days[2])"
+	assertEquals 'wednesday' '[[830,1215],[1400,1615],[1830,2030]]' "$(echo "$actual" | jq -c .[0].timings.days[3])"
+	assertEquals 'thursday' '[[830,1215],[1830,2130]]' "$(echo "$actual" | jq -c .[0].timings.days[4])"
+	assertEquals 'friday' '[[830,1215],[1400,1615],[1830,2030]]' "$(echo "$actual" | jq -c .[0].timings.days[5])"
 }
 
 . ./shunit2

@@ -27,7 +27,7 @@
 
 (def mon-fri-pattern #"(?is).+?:(?:[^:]+(?:am|pm))")
 (def timing-pattern #"(?i)(\d{1,2})[.:](\d{2})(am|pm)")
-(def day-names ["Mon" "Tue" "Wed" "Thu" "Fri"])
+(def day-names ["mon" "tue" "wed" "thu" "fri"])
 (def days-pattern #"(?i)Mon|Tue|Wed|Thu|Fri")
 
 (defn hours
@@ -61,7 +61,7 @@
   [mon-fri-item-string]
   (let [[days intervals-string] (split mon-fri-item-string ":")
         result (timing-intervals intervals-string)]
-    (map (fn [day] (when (includes? days day) result)) day-names)))
+    (map (fn [day] (when (includes? (.toLowerCase days) day) result)) day-names)))
 
 (defn mon-fri-timing-intervals
   [mon-fri-string]
