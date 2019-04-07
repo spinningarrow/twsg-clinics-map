@@ -21,10 +21,6 @@
       (str number)
       string)))
 
-(defn my-mapper
-  [v]
-  v)
-
 (defn my-reducer
   [memo [k v]]
   (assoc memo k (clean-number v)))
