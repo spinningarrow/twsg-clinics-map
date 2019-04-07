@@ -102,7 +102,7 @@ test_normalise_values() {
 		"sat": "24 HOURS"
 	}]'
 
-	actual="$(echo $input | ../normalise-values.cljs)"
+	actual="$(cd .. && echo $input | ./normalise_values.clj)"
 
 	assertEquals 'publicHolidays' '"Closed"' "$(echo "$actual" | jq -c .[0].publicHolidays)"
 	assertEquals 'sat' '"24 Hours"' "$(echo "$actual" | jq -c .[0].sat)"

@@ -1,6 +1,6 @@
-#!/usr/bin/env planck
+#!/usr/bin/env clj
 
-(require '[planck.core :refer [slurp *in*]]
+(require '[cheshire.core :refer [parse-string generate-string]]
          '[clojure.string :refer [capitalize]])
 
 (defn normalise-closed
@@ -21,22 +21,10 @@
   [memo [k v]]
   (assoc memo k (-> v normalise-24-hours normalise-closed)))
 
-(defn json->clj
-  [json]
-  (-> json
-      JSON.parse
-      (js->clj :keywordize-keys true)))
-
-(defn clj->json
-  [clj]
-  (-> clj
-      clj->js
-      JSON.stringify))
-
 (def in (-> *in*
             slurp
-            json->clj))
+            (parse-string true)))
 
 (print (->> in
             (map #(reduce my-reducer {} %1))
-            clj->json))
+            generate-string))
