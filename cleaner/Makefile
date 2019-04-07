@@ -15,7 +15,7 @@ positions.json: clinics-without-positions.json
 	cat clinics-without-positions.json | ./get-positions.cljs > positions.json
 
 clinics-without-positions.json: clinics-dirty.json
-	cat clinics-dirty.json | ./clean-numbers.cljs | ./normalise-values.cljs > clinics-without-positions.json
+	cat clinics-dirty.json | ./clean-numbers.cljs | ./normalise-values.clj > clinics-without-positions.json
 
 clinics-dirty.json: clinics.csv
 	csvjson --blank clinics.csv > clinics-dirty.json
