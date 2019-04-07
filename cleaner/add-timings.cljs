@@ -66,9 +66,10 @@
 
 (defn mon-fri-item-intervals
   [mon-fri-item-string]
-  (let [[days intervals-string] (split mon-fri-item-string ":")
+  (let [[days-or-day-range intervals-string] (split mon-fri-item-string ":")
+        days (explode-day-range days-or-day-range)
         result (timing-intervals intervals-string)]
-    (map (fn [day] (when (includes? (.toLowerCase days) day) result)) day-names)))
+    (map (fn [day] (when (includes? days day) result)) day-names)))
 
 (defn mon-fri-timing-intervals
   [mon-fri-string]
@@ -81,7 +82,7 @@
 (defn clinic->timings
   [clinic]
   (let [{monFri :monFri sun :sun sat :sat publicHolidays :publicHolidays} clinic
-        [mon tue wed thu fri] (mon-fri-timing-intervals monFri)]
+        [mon tue wed thu fri] (mon-fri-timing-intervals (.toLowerCase monFri))]
     {:days [(timing-intervals sun) mon tue wed thu fri (timing-intervals sat)]
      :publicHolidays (timing-intervals publicHolidays)}))
 
