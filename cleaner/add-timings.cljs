@@ -16,18 +16,10 @@
       clj->js
       JSON.stringify))
 
-(def timing-string "7.00pm")
-(def timing 1900)
-(def interval-string "\n7.00am - 1.00pm")
-(def intervals-string "7.00am - 1.00pm,\n6.00pm - 12.00am")
-(def timing-string-intervals [["7.00am" "1.00pm"] ["6.00pm" "12.00am"]])
-(def timing-intervals [[700 1300] [1800 2400]])
-(def mon-fri-item-string "Mon, Tue, Thu & Fri:\n9.00am - 12.30pm,\n2.00pm - 4.30pm")
-(def mon-fri-string "Mon, Tue, Thu & Fri:\n9.00am - 12.30pm,\n2.00pm - 4.30pm\n\nWed:\n9.00am - 12.30pm")
+(def day-names ["mon" "tue" "wed" "thu" "fri"])
 
 (def mon-fri-pattern #"(?is).+?:(?:[^:]+(?:am|pm))")
 (def timing-pattern #"(?i)(\d{1,2})[.:](\d{2})(am|pm)")
-(def day-names ["mon" "tue" "wed" "thu" "fri"])
 (def days-pattern #"(?i)Mon|Tue|Wed|Thu|Fri")
 (def day-range-pattern #"(?i)(mon|tue|wed|thu|fri) - (mon|tue|wed|thu|fri)")
 
@@ -43,17 +35,20 @@
   (js/parseInt mm))
 
 (defn timing
+  "8.30am -> 830"
   [timing-string]
   (when-let [[_ hh mm meridiem] (re-find timing-pattern timing-string)]
     (+ (minutes mm) (* (hours hh (.toLowerCase meridiem)) 100))))
 
 (defn timing-string-intervals
+  "'8.30am - 10.00am, 10.30am - 12pm' -> [[8.30am 10.00am] [10.30am 12pm]]"
   [intervals-string]
   (if (includes? intervals-string "24 H")
     [["12.00am" "11.59pm"]]
     (map #(split %1 "-") (split intervals-string ","))))
 
 (defn timing-intervals
+  "[[8.30am 10.00am]] -> [[830 1000]]"
   [intervals-string]
   (for [interval (timing-string-intervals intervals-string)]
     (map timing interval)))
