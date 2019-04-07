@@ -95,4 +95,17 @@ test_add_timings_when_mon_fri_includes_day_range() {
 	assertEquals 'friday' '[[830,2200]]' "$(echo "$actual" | jq -c .[0].timings.days[5])"
 }
 
+test_normalise_values() {
+	input='[{
+		"id": 282,
+		"publicHolidays": "CLOSED",
+		"sat": "24 HOURS"
+	}]'
+
+	actual="$(echo $input | ../normalise-values.cljs)"
+
+	assertEquals 'publicHolidays' '"Closed"' "$(echo "$actual" | jq -c .[0].publicHolidays)"
+	assertEquals 'sat' '"24 Hours"' "$(echo "$actual" | jq -c .[0].sat)"
+}
+
 . ./shunit2
