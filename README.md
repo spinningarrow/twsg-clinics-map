@@ -1,4 +1,4 @@
-# TWSG Clinics Map
+# TWSG Clinics Map [![Netlify Status](https://api.netlify.com/api/v1/badges/02f58585-c258-4982-a881-23a03a018e9b/deploy-status)](https://app.netlify.com/sites/twsgclinics/deploys)
 
 A map of all the panel clinics for TWSG.
 
