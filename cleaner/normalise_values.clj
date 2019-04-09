@@ -6,8 +6,8 @@
 (defn normalise-closed
   [value]
   (let [string (str value)]
-    (if (re-find #"(?i)\s*closed\s*" string)
-      (capitalize string)
+    (if-let [[_ match] (re-find #"(?i)\s*(closed)\s*" string)]
+      (capitalize match)
       value)))
 
 (defn normalise-24-hours

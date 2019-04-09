@@ -99,13 +99,18 @@ test_normalise_values() {
 	input='[{
 		"id": 282,
 		"publicHolidays": "CLOSED",
-		"sat": "24 HOURS"
+		"monFri": "  CLoSeD  ",
+		"sat": "24 HOURS",
+		"sun": "  24 HOuRS  "
 	}]'
 
 	actual="$(cd .. && echo $input | ./normalise_values.clj)"
 
+	assertEquals 'id' '282' "$(echo "$actual" | jq -c .[0].id)"
 	assertEquals 'publicHolidays' '"Closed"' "$(echo "$actual" | jq -c .[0].publicHolidays)"
-	assertEquals 'sat' '"24 Hours"' "$(echo "$actual" | jq -c .[0].sat)"
+	assertEquals 'monFri' '"24 Hours"' "$(echo "$actual" | jq -c .[0].sat)"
+	assertEquals 'sat' '"Closed"' "$(echo "$actual" | jq -c .[0].publicHolidays)"
+	assertEquals 'sun' '"24 Hours"' "$(echo "$actual" | jq -c .[0].sun)"
 }
 
 . ./shunit2
