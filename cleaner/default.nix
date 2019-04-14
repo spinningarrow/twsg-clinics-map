@@ -5,7 +5,7 @@ in pkgs.stdenv.mkDerivation rec {
 
   buildInputs = with pkgs; [
     clojure
-    python36Packages.csvkit
+    csvkit
     jq
   ];
 }
