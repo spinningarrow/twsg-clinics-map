@@ -17,14 +17,15 @@
       "24 Hours"
       value)))
 
-(defn my-reducer
-  [memo [k v]]
-  (assoc memo k (-> v normalise-24-hours normalise-closed)))
+(defn transform-map
+  [m]
+  (zipmap (keys m)
+          (map (comp normalise-closed normalise-24-hours) (vals m))))
 
 (def in (-> *in*
             slurp
             (parse-string true)))
 
 (print (->> in
-            (map #(reduce my-reducer {} %1))
+            (map transform-map)
             generate-string))
