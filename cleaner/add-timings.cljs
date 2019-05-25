@@ -54,6 +54,7 @@
     (map timing interval)))
 
 (defn explode-day-range
+  "tue-thu -> [tue wed thu]"
   [day-range]
   (if-let [[_ start-day end-day] (re-find day-range-pattern day-range)]
     (subvec day-names (.indexOf day-names start-day) (inc (.indexOf day-names end-day)))
@@ -75,11 +76,14 @@
       (apply map (fn [& args] (first (drop-while nil? args))) x))))
 
 (defn clinic->timings
-  [clinic]
-  (let [{monFri :monFri sun :sun sat :sat publicHolidays :publicHolidays} clinic
-        [mon tue wed thu fri] (mon-fri-timing-intervals (.toLowerCase monFri))]
-    {:days [(timing-intervals sun) mon tue wed thu fri (timing-intervals sat)]
-     :publicHolidays (timing-intervals publicHolidays)}))
+  [{monFri :monFri
+    sun :sun
+    sat :sat
+    publicHolidays :publicHolidays}]
+  {:days (concat [(timing-intervals sun)]
+                 (mon-fri-timing-intervals (.toLowerCase monFri))
+                 [(timing-intervals sat)])
+   :publicHolidays (timing-intervals publicHolidays)})
 
 (defn add-timings
   [clinic]
