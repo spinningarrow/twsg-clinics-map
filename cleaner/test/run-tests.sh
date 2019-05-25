@@ -26,7 +26,7 @@ test_add_timings_when_text_is_lowercase() {
 		"sun": "7.00am - 1.00pm,\\n6.00pm - 12.00am"
 	}]'
 
-	actual="$(echo $input | ../add-timings.cljs)"
+	actual="$(cd .. && echo $input | ./add_timings.clj)"
 
 	assertEquals 'sunday' '[[700,1300],[1800,0]]' "$(echo "$actual" | jq -c .[0].timings.days[0])"
 	assertEquals 'monday' '[[600,1300],[1700,0]]' "$(echo "$actual" | jq -c .[0].timings.days[1])"
@@ -47,7 +47,7 @@ test_add_timings_when_text_is_uppercase() {
 		"sun": "7.00AM - 1.00PM,\\n6.00PM - 12.00AM"
 	}]'
 
-	actual="$(echo $input | ../add-timings.cljs)"
+	actual="$(cd .. && echo $input | ./add_timings.clj)"
 
 	assertEquals 'sunday' '[[700,1300],[1800,0]]' "$(echo "$actual" | jq -c .[0].timings.days[0])"
 	assertEquals 'monday' '[[600,1300],[1700,0]]' "$(echo "$actual" | jq -c .[0].timings.days[1])"
@@ -68,7 +68,7 @@ test_add_timings_when_mon_fri_has_separate_days() {
 		"sun": "CLOSED"
 	}]'
 
-	actual="$(echo $input | ../add-timings.cljs)"
+	actual="$(cd .. && echo $input | ./add_timings.clj)"
 
 	assertEquals 'monday' '[[830,1215],[1400,1615],[1830,2030]]' "$(echo "$actual" | jq -c .[0].timings.days[1])"
 	assertEquals 'tuesday' '[[830,1215],[1400,1615],[1830,2030]]' "$(echo "$actual" | jq -c .[0].timings.days[2])"
@@ -86,7 +86,7 @@ test_add_timings_when_mon_fri_includes_day_range() {
 		"sun": "CLOSED"
 	}]'
 
-	actual="$(echo $input | ../add-timings.cljs)"
+	actual="$(cd .. && echo $input | ./add_timings.clj)"
 
 	assertEquals 'monday' '[[830,1400]]' "$(echo "$actual" | jq -c .[0].timings.days[1])"
 	assertEquals 'tuesday' '[[830,2200]]' "$(echo "$actual" | jq -c .[0].timings.days[2])"

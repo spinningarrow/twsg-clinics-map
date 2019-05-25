@@ -6,7 +6,7 @@ clinics.json.gz: clinics.json
 	gzip --stdout --best clinics.json > clinics.json.gz
 
 clinics.json: clinics-with-positions.json
-	cat clinics-with-positions.json | ./add-timings.cljs > clinics.json
+	cat clinics-with-positions.json | ./add_timings.clj > clinics.json
 
 clinics-with-positions.json: clinics-without-positions.json positions.json
 	./merge.cljs clinics-without-positions.json positions.json > clinics-with-positions.json

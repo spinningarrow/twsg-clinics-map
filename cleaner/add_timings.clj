@@ -1,20 +1,7 @@
-#!/usr/bin/env planck
+#!/usr/bin/env clj
 
-(require '[planck.core :refer [slurp *in*]]
-         '[planck.shell :refer [sh]]
-         '[clojure.string :refer [includes? join split]])
-
-(defn json->clj
-  [json]
-  (-> json
-      JSON.parse
-      (js->clj :keywordize-keys true)))
-
-(defn clj->json
-  [clj]
-  (-> clj
-      clj->js
-      JSON.stringify))
+(require '[cheshire.core :refer [parse-string generate-string]]
+         '[clojure.string :refer [includes? split]])
 
 (def day-names ["mon" "tue" "wed" "thu" "fri"])
 
@@ -25,14 +12,14 @@
 
 (defn hours
   [hh meridiem]
-  (let [hh-int (mod (js/parseInt hh) 12)]
+  (let [hh-int (mod (Integer/parseInt hh) 12)]
     (if (= "pm" meridiem)
       (+ hh-int 12)
       hh-int)))
 
 (defn minutes
   [mm]
-  (js/parseInt mm))
+  (Integer/parseInt mm))
 
 (defn timing
   "8.30am -> 830"
@@ -45,7 +32,7 @@
   [intervals-string]
   (if (includes? intervals-string "24 H")
     [["12.00am" "11.59pm"]]
-    (map #(split %1 "-") (split intervals-string ","))))
+    (map #(split %1 #"-") (split intervals-string #","))))
 
 (defn timing-intervals
   "[[8.30am 10.00am]] -> [[830 1000]]"
@@ -62,7 +49,7 @@
 
 (defn mon-fri-item-intervals
   [mon-fri-item-string]
-  (let [[days-or-day-range intervals-string] (split mon-fri-item-string ":")
+  (let [[days-or-day-range intervals-string] (split mon-fri-item-string #":")
         days (explode-day-range days-or-day-range)
         result (timing-intervals intervals-string)]
     (map (fn [day] (when (includes? days day) result)) day-names)))
@@ -91,8 +78,8 @@
 
 (def in (-> *in*
             slurp
-            json->clj))
+            (parse-string true)))
 
 (print (->> in
             (map add-timings)
-            clj->json))
+            generate-string))
