@@ -11,7 +11,7 @@ test_merge() {
 	data1='[{ "id": 1, "x": 2 }]'
 	data2='[{ "id": 1, "y": 3 }]'
 
-	actual="$(../merge.cljs <(echo "$data1") <(echo "$data2") | jq)"
+	actual="$(cd .. && ./merge.clj <(echo "$data1") <(echo "$data2") | jq)"
 	expected=$(echo '[{ "id": 1, "x": 2, "y": 3 }]' | jq)
 
 	assertEquals "$expected" "$actual"

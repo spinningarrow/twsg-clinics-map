@@ -9,7 +9,7 @@ clinics.json: clinics-with-positions.json
 	cat clinics-with-positions.json | ./add_timings.clj > clinics.json
 
 clinics-with-positions.json: clinics-without-positions.json positions.json
-	./merge.cljs clinics-without-positions.json positions.json > clinics-with-positions.json
+	./merge.clj clinics-without-positions.json positions.json > clinics-with-positions.json
 
 positions.json: clinics-without-positions.json
 	cat clinics-without-positions.json | ./get-positions.cljs > positions.json
