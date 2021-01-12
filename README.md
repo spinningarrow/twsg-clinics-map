@@ -2,6 +2,8 @@
 
 A map of all the panel clinics for TWSG.
 
+**Archived**: This project is archived since it is superseded by the offical app.
+
 ## Develop
 
 This repo contains several sub-projects: 
